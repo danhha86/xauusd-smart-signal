@@ -1,44 +1,24 @@
-# XAUUSD Smart Signal — starter project
+# XAUUSD Smart Signal (clean rebuild)
 
-This is a starter engineering prototype, **not a compiled APK** and not a validated profitable trading system.
+A minimal native Android app for manually entered XAUUSD multi-timeframe analysis.
 
-## What is included
-- `android/`: Android app (Kotlin + Jetpack Compose), target Android 14 / API 34. It polls the backend for the latest signal.
-- `backend/`: Python standard-library HTTP service that accepts OHLC bars from MT4 and calculates a basic multi-timeframe setup.
-- `mt4/`: MQL4 Expert Advisor that exports closed XAUUSD candles for H4/H1/M15/M5. It does not place trades.
-- `.github/workflows/build-apk.yml`: GitHub Actions workflow to compile a debug APK in the cloud.
+## Requirements
+- Android Studio / Android SDK 35 for local builds, or GitHub Actions.
+- JDK 17 and Gradle 8.9.
+- Android 8.0+ (minSdk 26); target SDK 35.
 
-## Build the APK without installing Android Studio on your computer
-1. Sign in to GitHub and create a **private** repository, for example `xauusd-smart-signal`.
-2. Upload the contents of this project (the files inside this folder, not the enclosing folder) to the repository. Keep `.github/workflows/build-apk.yml` in place.
-3. Open the repository's **Actions** tab and select **Build Android APK**.
-4. Choose **Run workflow** if it has not started automatically, then wait for the run to finish successfully.
-5. Open the completed run, scroll to **Artifacts**, and download `XAUUSD-Smart-Signal-debug-apk`.
-6. Extract the ZIP on your phone or computer. Install `app-debug.apk` on the Android 14 phone. Android may ask you to allow installation from that source.
+## GitHub Actions build
+1. Upload the contents of this folder to the root of a GitHub repository (not the enclosing folder).
+2. Open **Actions** → **Build Android APK**.
+3. Choose **Run workflow** (or push to `main`).
+4. When successful, open the run → **Artifacts** → download `XAUUSD-Smart-Signal-debug-apk`.
+5. Extract the ZIP and install `app-debug.apk` on the Android phone. Allow installation from the browser/files app if Android asks.
 
-The workflow builds an unsigned-for-release **debug APK** that is suitable for personal testing. It is not a Play Store release. A release build should be signed securely before distribution.
+APK output: `android/app/build/outputs/apk/debug/app-debug.apk`.
 
-## Run the backend
-The backend must run on a reachable computer/server; it does not run inside the APK.
+## Current scope
+- Manual input for current price, M15 ATR and RSI, plus H4/H1/M15/M5 context.
+- Rule-based BUY/SELL/WAIT decision, reference entry, ATR-based SL and 1:2 TP.
+- No live market feed, broker connection, automatic order placement, or guaranteed performance.
 
-```bash
-cd backend
-API_TOKEN='replace-with-a-long-random-token' python app.py
-```
-
-For a phone outside the same computer, use a reachable HTTPS server URL in the app. Do not expose the backend publicly over plain HTTP. Put it behind HTTPS and a firewall/reverse proxy. The sample token is for development only.
-
-## Configure MT4
-1. Copy `mt4/XAUUSD_SignalBridge.mq4` into the terminal's `MQL4/Experts/` folder and compile it in MetaEditor.
-2. Set `ApiBaseUrl` to the backend URL and `ApiToken` to the same token used by the backend.
-3. In MT4, open Tools → Options → Expert Advisors and allow WebRequest for that exact backend base URL.
-4. Attach the EA to an XAUUSD chart. Ensure the symbol input matches the broker symbol (some accounts use a suffix such as `XAUUSD.` or `GOLD`).
-5. Enable AutoTrading only as required for the EA to run; this EA transmits candles and contains no order-placement logic.
-
-## Important limitations and safety
-- This is a prototype. Its EMA/sweep/structure rules are simplified and have not been backtested or forward-tested on HFM data. Do not rely on its signals for live trading.
-- The backend requires at least 205 bars per timeframe before it can evaluate EMA 200. Wait for MT4 history to download.
-- The Android app's default URL (`10.0.2.2`) is for an Android emulator only. On a physical phone, enter the backend's reachable HTTPS URL and the matching API token.
-- The sample app currently keeps API settings in memory only; they reset when the app process restarts.
-- HFM contract size, tick value, tick size, minimum lot and lot step must be verified in the broker's MT4 symbol specification before using any risk estimate. With a $15 balance, the minimum lot may exceed a conservative risk budget; in that case, skip the trade.
-- The app is an analysis/alert tool. It does not connect to the MT4 account for order placement and does not guarantee profit.
+This is a starter implementation for testing and iteration, not financial advice.
