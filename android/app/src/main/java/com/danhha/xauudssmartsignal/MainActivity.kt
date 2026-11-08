@@ -81,7 +81,7 @@ class MainActivity : Activity() {
     }
     private fun space(h: Int) = TextView(this).apply { height = h }
     private fun field(hintText: String) = EditText(this).apply {
-        hint = hintText; textSize = 15f; singleLine = true
+        hint = hintText; textSize = 15f; setSingleLine(true)
         inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL or android.text.InputType.TYPE_NUMBER_FLAG_SIGNED
         setPadding(12, 10, 12, 10)
         background = getDrawable(android.R.drawable.edit_text)
